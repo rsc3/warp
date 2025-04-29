@@ -214,6 +214,8 @@ task StarAlignFastqMultisample {
 
 task STARsoloFastq {
   input {
+    String cloud_provider
+
     Array[File] r1_fastq
     Array[File] r2_fastq
     File tar_star_reference
@@ -230,7 +232,12 @@ task STARsoloFastq {
     String reference_path = tar_star_reference
 
     # runtime values
-    String samtools_star_docker_path
+    String aws_samtools_star_docker_prefix = "amazon/aws-samtools-star:latest"
+    String gcp_samtools_star_docker_prefix = "bashell/"
+    String acr_samtools_star_docker_prefix = "dsppipelinedev.azurecr.io/"
+
+    String samtools_star_docker_path = if cloud_provider == "aws" then aws_samtools_star_docker_prefix else if cloud_provider == "gcp" then gcp_samtools_star_docker_prefix else acr_samtools_star_docker_prefix
+    
     String cpu_platform = "Intel Ice Lake"
     Int input_size = ceil(size(r1_fastq, "GiB") + size(r2_fastq, "GiB"))
     Int cpu = 16
